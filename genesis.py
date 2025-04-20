@@ -222,7 +222,7 @@ mangaList = [
 ]
 
 # descomentar para bypassar os capitulos
-# mangaList = []
+mangaList = []
 
 # ordear mangaList
 mangaList.sort()
