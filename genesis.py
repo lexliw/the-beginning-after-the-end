@@ -1,4 +1,3 @@
-
 #%%
 # lista dos capitulos que srão baixados
 mangaList = [
@@ -230,6 +229,8 @@ mangaList.sort()
 # funções que serão usadas para baixar os mangás
 import requests
 import os
+import time
+
 def folderName(url):
     folder = url.split('/')[5].replace('.html','')
     num = folder.split('-')[1]
@@ -250,14 +251,30 @@ def getManga(manga):
     newpath = f'./{folder}'
     if not os.path.exists(newpath):
         os.makedirs(newpath)
-        # print('---')
     else:
         print('manga já baixado')
         return
     
     payload = {}
     headers = {}
-    response = requests.request("GET", url, headers=headers, data=payload)
+
+    # Tentar novamente em caso de erro de conexão
+    max_retries = 5
+    retries = 0
+    while retries < max_retries:
+        try:
+            response = requests.request("GET", url, headers=headers, data=payload)
+            response.raise_for_status()  # Levanta uma exceção para códigos de status HTTP de erro
+            break
+        except requests.exceptions.RequestException as e:
+            print(f"Erro ao acessar {url}: {e}")
+            retries += 1
+            if retries < max_retries:
+                print(f"Tentando novamente ({retries}/{max_retries}) em 1 segundo...")
+                time.sleep(1)
+            else:
+                print("Número máximo de tentativas atingido. Pulando este manga.")
+                return
 
     imagesRaw = response.text.split('data-src="')
     i = 0
@@ -270,12 +287,29 @@ def getManga(manga):
     
     # baixar imagens
     for image in listRawImages:
-        img_data = requests.get(image).content
-        file = fileName(image)
-        with open(f'./{folder}/{file}', 'wb') as handler:
-            handler.write(img_data)
+        max_retries = 5
+        retries = 0
+        while retries < max_retries:
+            try:
+                img_data = requests.get(image).content
+                break
+            except requests.exceptions.RequestException as e:
+                print(f"Erro ao baixar a imagem {image}: {e}")
+                retries += 1
+                if retries < max_retries:
+                    print(f"Tentando novamente ({retries}/{max_retries}) em 1 segundo...")
+                    time.sleep(1)
+                else:
+                    print(f"Falha ao baixar a imagem {image} após {max_retries} tentativas. Pulando...")
+                    img_data = None
+                    break
 
-    # return listImages
+        if img_data:
+            file = fileName(image)
+            with open(f'./{folder}/{file}', 'wb') as handler:
+                handler.write(img_data)
+
+# return listImages
 #%%
 
 #%%
