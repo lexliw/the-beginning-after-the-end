@@ -1,0 +1,30 @@
+# Ignorar arquivos e pastas gerados pelo sistema operacional
+.DS_Store
+Thumbs.db
+
+# Ignorar pastas e arquivos do Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.env
+.env
+
+# Ignorar logs e arquivos temporários
+*.log
+*.tmp
+*.swp
+
+# Ignorar pastas de saída ou compilação
+build/
+dist/
+*.egg-info/
+
+# Ignorar arquivos de configuração local
+.vscode/
+.idea/
+
+# Ignorar arquivos baixados ou gerados
+downloads/
+*.zip
+*.tar.gz

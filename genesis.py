@@ -372,6 +372,41 @@ for folder in onlyfolders:
     # print(f'{folder}:{onlyfiles}')
 
 
+#%%
+from PIL import Image
+import os
+from os.path import isfile, isdir, join
+
+def reduce_image_size(image_path, output_path, quality=85):
+    try:
+        with Image.open(image_path) as img:
+            img = img.convert("RGB")  # Garantir que a imagem esteja no formato RGB
+            img.save(output_path, "JPEG", optimize=True, quality=quality)
+            print(f"Imagem reduzida: {output_path}")
+    except Exception as e:
+        print(f"Erro ao processar {image_path}: {e}")
+
+def process_folders(base_path, quality=85):
+    onlyfolders = [f for f in os.listdir(base_path) if isdir(join(base_path, f))]
+    onlyfolders.sort()
+
+    for folder in onlyfolders:
+        folder_path = join(base_path, folder)
+        onlyfiles = [f for f in os.listdir(folder_path) if isfile(join(folder_path, f))]
+        for file in onlyfiles:
+            file_path = join(folder_path, file)
+            if file.lower().endswith(('.png', '.jpg', '.jpeg')):
+                output_path = file_path  # Sobrescreve o arquivo original
+                reduce_image_size(file_path, output_path, quality=quality)
+
+# Caminho base do projeto
+base_path = './'
+
+# Qualidade desejada (ajuste conforme necessário)
+image_quality = 70
+
+# Processar todas as pastas
+process_folders(base_path, quality=image_quality)
 
 # %%
 # cria os index.html
